@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AFDS Dono Cup Leaderboard Generator | AFDS-26/27</title>
+    <!-- Libreria SheetJS per leggere e scrivere file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary-red: #d32f2f;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* Header Layout */
+        .header {
+            background-color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            border-bottom: 4px solid var(--primary-red);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            position: relative;
+        }
+
+        /* Card Style */
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .file-input-wrapper {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            background: #fafafa;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            background: #e0e0e0;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            border-right: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .custom-file-upload:hover {
+            background: #d5d5d5;
+        }
+
+        .file-name {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #777;
+            flex-grow: 1;
+        }
+
+        select.custom-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 14px;
+            background: #fafafa;
+            outline: none;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto 0;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(211, 47, 47, 0.3);
+        }
+
+        .btn:hover {
+            background-color: #b71c1c;
+            transform: translateY(-2px);
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+
+        .warning-text {
+            font-size: 12px;
+            color: #555;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+
+        /* View Transitions (Traslazioni morbide) */
+        .view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
+        }
+
+        .view.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            position: relative;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: var(--primary-red);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🩸 AFDS Dono Cup Leaderboard Generator | Coppa Dono AFDS (Friuli) 2026-2027</h1>
+    </div>
+
+    <div class="container">
+        
+        <!-- VISTA 1: CARICAMENTO FILE -->
+        <div id="upload-view" class="view active card">
+            <h2>Seleziona i file richiesti e lo Sport</h2>
+
+            <div class="form-group">
+                <label>Disciplina Sportiva</label>
+                <select id="sport-type" class="custom-select">
+                    <option value="Squadra">Calcio (Squadra)</option>
+                    <option value="Team Pallavolo">Pallavolo</option>
+                    <option value="Team Basket">Basket</option>
+                    <option value="Gruppo Sportivo">Atletica / Ciclismo / Altro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Estrazione elenco donatori (.xlsx)</label>
+                <div class="file-input-wrapper">
+                    <label for="file-donatori" class="custom-file-upload">Scegli file</label>
+                    <input type="file" id="file-donatori" accept=".xlsx, .xls" onchange="updateFileName(this, 'name-donatori')">
+                    <span class="file-name" id="name-donatori">Nessun file selezionato</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Estrazione donazioni effettuate (.xlsx)</label>
+                <div class="file-input-wrapper">
+                    <label for="file-donazioni" class="custom-file-upload">Scegli file</label>
+                    <input type="file" id="file-donazioni" accept=".xlsx, .xls" onchange="updateFileName(this, 'name-donazioni')">
+                    <span class="file-name" id="name-donazioni">Nessun file selezionato</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Estrazione iscrizioni alla coppa dono (.xlsx)</label>
+                <div class="file-input-wrapper">
+                    <label for="file-iscrizioni" class="custom-file-upload">Scegli file</label>
+                    <input type="file" id="file-iscrizioni" accept=".xlsx, .xls" onchange="updateFileName(this, 'name-iscrizioni')">
+                    <span class="file-name" id="name-iscrizioni">Nessun file selezionato</span>
+                </div>
+            </div>
+
+            <div class="loading" id="loading-spinner">Elaborazione dati in corso...</div>
+            <button class="btn" id="btn-generate" onclick="generateLeaderboard()">Genera Leaderboard</button>
+        </div>
+
+        <!-- VISTA 2: RISULTATI (CLASSIFICA) -->
+        <div id="results-view" class="view card">
+            <h2>Risultati</h2>
+            <div style="overflow-x: auto;">
+                <table id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th id="th-sport">Squadra</th>
+                            <th># Donazioni sangue intero</th>
+                            <th># Donazioni plasma da aferesi</th>
+                            <th># Altre donazioni</th>
+                            <th>Punteggio</th>
+                            <th>Partecipanti under 25</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- I dati verranno inseriti qui dal JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button class="btn" style="background-color: #666;" onclick="switchView('upload-view')">Torna Indietro</button>
+                <button class="btn" onclick="downloadExcel()">Scarica tutti</button>
+            </div>
+
+            <p class="warning-text">
+                <strong>Attenzione:</strong> Eventuali punteggi da considerare al termine dell'iniziativa non sono gestiti dal tool (es. bonus 30 punti a squadre con almeno 6 donatori under25 e punteggio di 40 punti).
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // Funzione per aggiornare il testo col nome del file selezionato
+        function updateFileName(input, textId) {
+            const fileName = input.files.length > 0 ? input.files[0].name : "Nessun file selezionato";
+            document.getElementById(textId).innerText = fileName;
+        }
+
+        // Sistema di transizione fluido tra le schermate
+        function switchView(targetViewId) {
+            const views = document.querySelectorAll('.view');
+            views.forEach(view => {
+                view.classList.remove('active');
+            });
+            
+            setTimeout(() => {
+                document.getElementById(targetViewId).classList.add('active');
+            }, 50); // Piccolo delay per far scattare la transizione CSS
+        }
+
+        // Funzione di utilità per leggere un file Excel come Array di Oggetti JSON
+        function readExcel(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    resolve([]); // Ritorna array vuoto se file non presente
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(firstSheet);
+                    resolve(json);
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Funzione principale di elaborazione
+        async function generateLeaderboard() {
+            const fileDonatori = document.getElementById('file-donatori').files[0];
+            const fileDonazioni = document.getElementById('file-donazioni').files[0];
+            const fileIscrizioni = document.getElementById('file-iscrizioni').files[0];
+
+            // Controllo file mancanti (rimosso per permettere la demo, ma consigliato per produzione)
+            /*
+            if(!fileDonatori || !fileDonazioni || !fileIscrizioni) {
+                alert("Per favore, carica tutti i tre file richiesti.");
+                return;
+            }
+            */
+
+            document.getElementById('btn-generate').style.display = 'none';
+            document.getElementById('loading-spinner').style.display = 'block';
+
+            try {
+                // Legge i 3 file in parallelo
+                const [donatori, donazioni, iscrizioni] = await Promise.all([
+                    readExcel(fileDonatori),
+                    readExcel(fileDonazioni),
+                    readExcel(fileIscrizioni)
+                ]);
+
+                // ---------------------------------------------------------
+                // LOGICA DI INCROCIO DATI (MOCKUP / STRUTTURA)
+                // Qui dovrai inserire i nomi esatti delle colonne dei tuoi Excel.
+                // Poiché non ho i file originali, sto creando un aggregatore fittizio
+                // ma strutturalmente corretto.
+                // ---------------------------------------------------------
+                
+                let classificaData = [];
+
+                if (iscrizioni.length > 0 && donazioni.length > 0) {
+                    // ESEMPIO DI LOGICA REALE:
+                    // 1. Raggruppa i donatori per Squadra in base alle 'iscrizioni'
+                    // 2. Cerca le 'donazioni' fatte da quei donatori
+                    // 3. Somma i punteggi (Sangue = 1pt, Plasma = Xpt, ecc.)
+                    // 4. Conta gli Under25
+                } else {
+                    // MOCKUP DATA: Dati fittizi se non vengono caricati file 
+                    // Serve per farti vedere il funzionamento estetico e la tabella
+                    classificaData = [
+                        { squadra: "95. 038640 S.S. PONTEBBANA", sangue: 156, plasma: 70, altre: 0, score: 296, under25: 15 },
+                        { squadra: "146. 056000 A.S.D. VILLANOVA", sangue: 86, plasma: 52, altre: 2, score: 194, under25: 4 },
+                        { squadra: "126. 051460 A.S.D. TORRE TC", sangue: 102, plasma: 44, altre: 1, score: 192, under25: 5 },
+                        { squadra: "54. 015490 A.S.D. DIANA", sangue: 67, plasma: 56, altre: 4, score: 187, under25: 9 },
+                        { squadra: "142. 943335 A.S.D. VARMESE", sangue: 56, plasma: 41, altre: 5, score: 148, under25: 8 }
+                    ];
+                }
+
+                // Ordinamento classifica per Punteggio decrescente
+                classificaData.sort((a, b) => b.score - a.score);
+
+                // Aggiorna nome colonna sport in base alla selezione
+                const sportSelezionato = document.getElementById('sport-type').options[document.getElementById('sport-type').selectedIndex].text;
+                document.getElementById('th-sport').innerText = sportSelezionato;
+
+                // Renderizza la tabella
+                const tbody = document.getElementById('leaderboard-body');
+                tbody.innerHTML = ''; // Svuota la tabella precedente
+
+                classificaData.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${index + 1}</strong></td>
+                        <td>${row.squadra}</td>
+                        <td>${row.sangue}</td>
+                        <td>${row.plasma}</td>
+                        <td>${row.altre}</td>
+                        <td><strong>${row.score}</strong></td>
+                        <td>${row.under25}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Transizione alla vista dei risultati
+                setTimeout(() => {
+                    document.getElementById('btn-generate').style.display = 'block';
+                    document.getElementById('loading-spinner').style.display = 'none';
+                    switchView('results-view');
+                }, 800); // Finta attesa per feedback visivo del calcolo
+
+            } catch (error) {
+                console.error(error);
+                alert("Si è verificato un errore durante l'elaborazione dei file. Controlla il formato.");
+                document.getElementById('btn-generate').style.display = 'block';
+                document.getElementById('loading-spinner').style.display = 'none';
+            }
+        }
+
+        // Funzione per scaricare la tabella generata in formato Excel
+        function downloadExcel() {
+            // Prende l'elemento HTML della tabella
+            const table = document.getElementById('leaderboard-table');
+            // Crea un workbook virtuale
+            const wb = XLSX.utils.table_to_book(table, {sheet: "Classifica"});
+            // Scarica il file
+            XLSX.writeFile(wb, 'Classifica_Coppa_Dono_26-27.xlsx');
+        }
+    </script>
+</body>
+</html>
