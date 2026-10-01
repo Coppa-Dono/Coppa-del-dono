@@ -14,6 +14,10 @@
             --border-color: #ddd;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
@@ -38,13 +42,16 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-weight: 500;
+            font-weight: 600;
+            line-height: 1.3;
         }
 
         /* Main Container */
         .container {
+            width: 100%;
             max-width: 1100px;
             margin: 40px auto;
+            padding: 0 15px; /* Margine di sicurezza per mobile */
             position: relative;
         }
 
@@ -54,6 +61,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             padding: 30px;
+            width: 100%;
         }
 
         .card h2 {
@@ -73,6 +81,7 @@
             display: block;
             margin-bottom: 8px;
             font-size: 14px;
+            font-weight: 500;
             color: #555;
         }
 
@@ -83,6 +92,7 @@
             border-radius: 20px;
             overflow: hidden;
             background: #fafafa;
+            flex-wrap: nowrap;
         }
 
         .file-input-wrapper input[type="file"] {
@@ -91,11 +101,14 @@
 
         .custom-file-upload {
             background: #e0e0e0;
-            padding: 10px 20px;
+            padding: 12px 20px;
             cursor: pointer;
             font-size: 14px;
+            font-weight: 500;
             border-right: 1px solid var(--border-color);
             transition: background 0.2s;
+            white-space: nowrap; /* Impedisce che il pulsante vada a capo */
+            flex-shrink: 0;
         }
 
         .custom-file-upload:hover {
@@ -103,10 +116,13 @@
         }
 
         .file-name {
-            padding: 10px 20px;
+            padding: 10px 15px;
             font-size: 14px;
             color: #777;
             flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Taglia i nomi file troppo lunghi con ... */
         }
 
         select.custom-select {
@@ -117,6 +133,7 @@
             font-size: 14px;
             background: #fafafa;
             outline: none;
+            appearance: none;
         }
 
         /* Buttons */
@@ -127,16 +144,40 @@
             padding: 12px 30px;
             border-radius: 25px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
             display: block;
             margin: 30px auto 0;
             transition: background 0.3s, transform 0.2s;
             box-shadow: 0 4px 6px rgba(211, 47, 47, 0.3);
+            text-align: center;
         }
 
         .btn:hover {
             background-color: #b71c1c;
             transform: translateY(-2px);
+        }
+
+        /* Gruppo pulsanti responsivo */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .button-group .btn {
+            margin: 0;
+            flex: 1 1 auto;
+            min-width: 200px;
+        }
+
+        /* Table Responsive Wrapper */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Scroll fluido su iOS */
         }
 
         /* Table */
@@ -145,6 +186,7 @@
             border-collapse: collapse;
             margin-top: 20px;
             font-size: 14px;
+            min-width: 700px; /* Garantisce che la tabella non si schiacci troppo prima dello scroll */
         }
 
         th, td {
@@ -156,6 +198,7 @@
         th {
             font-weight: 600;
             color: #333;
+            background-color: #f4f6f8;
         }
 
         tr:nth-child(even) { background-color: #f9f9f9; }
@@ -164,11 +207,15 @@
         .warning-text {
             font-size: 12px;
             color: #555;
-            margin-top: 20px;
+            margin-top: 25px;
             line-height: 1.5;
+            background-color: #fff9c4;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #fbc02d;
         }
 
-        /* View Transitions (Traslazioni morbide) */
+        /* View Transitions */
         .view {
             position: absolute;
             top: 0;
@@ -189,16 +236,86 @@
 
         .loading {
             text-align: center;
-            font-size: 18px;
+            font-size: 16px;
+            font-weight: 500;
             color: var(--primary-red);
             display: none;
+            margin-top: 20px;
+        }
+
+        /* =========================================
+           MEDIA QUERIES PER SMARTPHONE E TABLET 
+           ========================================= */
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+                font-size: 16px;
+            }
+
+            .container {
+                margin: 20px auto;
+            }
+
+            .card {
+                padding: 20px 15px;
+            }
+
+            .card h2 {
+                font-size: 16px;
+            }
+
+            .custom-file-upload {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+
+            .file-name {
+                font-size: 13px;
+            }
+
+            .btn {
+                width: 100%;
+                font-size: 15px;
+            }
+
+            .button-group .btn {
+                min-width: 100%;
+            }
+
+            th, td {
+                padding: 10px 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .file-input-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+                border-radius: 8px;
+            }
+
+            .custom-file-upload {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                text-align: center;
+                border-radius: 8px 8px 0 0;
+            }
+
+            .file-name {
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>🩸 AFDS Dono Cup Leaderboard Generator | Coppa Dono AFDS (Friuli) 2026-2027</h1>
+        <h1>🩸 AFDS Dono Cup Leaderboard Generator | Coppa Dono AFDS (Friuli) 26/27</h1>
     </div>
 
     <div class="container">
@@ -251,7 +368,8 @@
         <!-- VISTA 2: RISULTATI (CLASSIFICA) -->
         <div id="results-view" class="view card">
             <h2>Risultati</h2>
-            <div style="overflow-x: auto;">
+            
+            <div class="table-responsive">
                 <table id="leaderboard-table">
                     <thead>
                         <tr>
@@ -270,9 +388,9 @@
                 </table>
             </div>
 
-            <div style="display: flex; gap: 15px; justify-content: center;">
+            <div class="button-group">
                 <button class="btn" style="background-color: #666;" onclick="switchView('upload-view')">Torna Indietro</button>
-                <button class="btn" onclick="downloadExcel()">Scarica tutti</button>
+                <button class="btn" onclick="downloadExcel()">Scarica classifica</button>
             </div>
 
             <p class="warning-text">
@@ -327,14 +445,6 @@
             const fileDonazioni = document.getElementById('file-donazioni').files[0];
             const fileIscrizioni = document.getElementById('file-iscrizioni').files[0];
 
-            // Controllo file mancanti (rimosso per permettere la demo, ma consigliato per produzione)
-            /*
-            if(!fileDonatori || !fileDonazioni || !fileIscrizioni) {
-                alert("Per favore, carica tutti i tre file richiesti.");
-                return;
-            }
-            */
-
             document.getElementById('btn-generate').style.display = 'none';
             document.getElementById('loading-spinner').style.display = 'block';
 
@@ -345,25 +455,13 @@
                     readExcel(fileDonazioni),
                     readExcel(fileIscrizioni)
                 ]);
-
-                // ---------------------------------------------------------
-                // LOGICA DI INCROCIO DATI (MOCKUP / STRUTTURA)
-                // Qui dovrai inserire i nomi esatti delle colonne dei tuoi Excel.
-                // Poiché non ho i file originali, sto creando un aggregatore fittizio
-                // ma strutturalmente corretto.
-                // ---------------------------------------------------------
                 
                 let classificaData = [];
 
                 if (iscrizioni.length > 0 && donazioni.length > 0) {
-                    // ESEMPIO DI LOGICA REALE:
-                    // 1. Raggruppa i donatori per Squadra in base alle 'iscrizioni'
-                    // 2. Cerca le 'donazioni' fatte da quei donatori
-                    // 3. Somma i punteggi (Sangue = 1pt, Plasma = Xpt, ecc.)
-                    // 4. Conta gli Under25
+                    // Metti qui la logica di calcolo reale
                 } else {
-                    // MOCKUP DATA: Dati fittizi se non vengono caricati file 
-                    // Serve per farti vedere il funzionamento estetico e la tabella
+                    // MOCKUP DATA per test visuale
                     classificaData = [
                         { squadra: "95. 038640 S.S. PONTEBBANA", sangue: 156, plasma: 70, altre: 0, score: 296, under25: 15 },
                         { squadra: "146. 056000 A.S.D. VILLANOVA", sangue: 86, plasma: 52, altre: 2, score: 194, under25: 4 },
@@ -382,7 +480,7 @@
 
                 // Renderizza la tabella
                 const tbody = document.getElementById('leaderboard-body');
-                tbody.innerHTML = ''; // Svuota la tabella precedente
+                tbody.innerHTML = ''; 
 
                 classificaData.forEach((row, index) => {
                     const tr = document.createElement('tr');
@@ -403,7 +501,7 @@
                     document.getElementById('btn-generate').style.display = 'block';
                     document.getElementById('loading-spinner').style.display = 'none';
                     switchView('results-view');
-                }, 800); // Finta attesa per feedback visivo del calcolo
+                }, 800); 
 
             } catch (error) {
                 console.error(error);
@@ -415,11 +513,8 @@
 
         // Funzione per scaricare la tabella generata in formato Excel
         function downloadExcel() {
-            // Prende l'elemento HTML della tabella
             const table = document.getElementById('leaderboard-table');
-            // Crea un workbook virtuale
             const wb = XLSX.utils.table_to_book(table, {sheet: "Classifica"});
-            // Scarica il file
             XLSX.writeFile(wb, 'Classifica_Coppa_Dono_26-27.xlsx');
         }
     </script>
