@@ -51,7 +51,7 @@
             width: 100%;
             max-width: 1100px;
             margin: 40px auto;
-            padding: 0 15px; /* Margine di sicurezza per mobile */
+            padding: 0 15px;
             position: relative;
         }
 
@@ -107,7 +107,7 @@
             font-weight: 500;
             border-right: 1px solid var(--border-color);
             transition: background 0.2s;
-            white-space: nowrap; /* Impedisce che il pulsante vada a capo */
+            white-space: nowrap;
             flex-shrink: 0;
         }
 
@@ -122,7 +122,7 @@
             flex-grow: 1;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis; /* Taglia i nomi file troppo lunghi con ... */
+            text-overflow: ellipsis;
         }
 
         select.custom-select {
@@ -158,7 +158,6 @@
             transform: translateY(-2px);
         }
 
-        /* Gruppo pulsanti responsivo */
         .button-group {
             display: flex;
             gap: 15px;
@@ -177,7 +176,7 @@
         .table-responsive {
             width: 100%;
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch; /* Scroll fluido su iOS */
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Table */
@@ -186,7 +185,7 @@
             border-collapse: collapse;
             margin-top: 20px;
             font-size: 14px;
-            min-width: 700px; /* Garantisce che la tabella non si schiacci troppo prima dello scroll */
+            min-width: 700px;
         }
 
         th, td {
@@ -243,53 +242,17 @@
             margin-top: 20px;
         }
 
-        /* =========================================
-           MEDIA QUERIES PER SMARTPHONE E TABLET 
-           ========================================= */
-        
         @media (max-width: 768px) {
-            .header {
-                padding: 15px 20px;
-            }
-
-            .header h1 {
-                font-size: 16px;
-            }
-
-            .container {
-                margin: 20px auto;
-            }
-
-            .card {
-                padding: 20px 15px;
-            }
-
-            .card h2 {
-                font-size: 16px;
-            }
-
-            .custom-file-upload {
-                padding: 10px 15px;
-                font-size: 13px;
-            }
-
-            .file-name {
-                font-size: 13px;
-            }
-
-            .btn {
-                width: 100%;
-                font-size: 15px;
-            }
-
-            .button-group .btn {
-                min-width: 100%;
-            }
-
-            th, td {
-                padding: 10px 10px;
-                font-size: 13px;
-            }
+            .header { padding: 15px 20px; }
+            .header h1 { font-size: 16px; }
+            .container { margin: 20px auto; }
+            .card { padding: 20px 15px; }
+            .card h2 { font-size: 16px; }
+            .custom-file-upload { padding: 10px 15px; font-size: 13px; }
+            .file-name { font-size: 13px; }
+            .btn { width: 100%; font-size: 15px; }
+            .button-group .btn { min-width: 100%; }
+            th, td { padding: 10px 10px; font-size: 13px; }
         }
 
         @media (max-width: 480px) {
@@ -298,17 +261,13 @@
                 align-items: stretch;
                 border-radius: 8px;
             }
-
             .custom-file-upload {
                 border-right: none;
                 border-bottom: 1px solid var(--border-color);
                 text-align: center;
                 border-radius: 8px 8px 0 0;
             }
-
-            .file-name {
-                text-align: center;
-            }
+            .file-name { text-align: center; }
         }
     </style>
 </head>
@@ -378,12 +337,14 @@
                             <th># Donazioni sangue intero</th>
                             <th># Donazioni plasma da aferesi</th>
                             <th># Altre donazioni</th>
-                            <th>Punteggio</th>
+                            <th>Punteggio Donazioni</th>
                             <th>Partecipanti under 25</th>
+                            <th>Bonus (+30 pts)</th>
+                            <th>Punteggio TOTALE</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboard-body">
-                        <!-- I dati verranno inseriti qui dal JS -->
+                        <!-- I dati verranno inseriti dal JS -->
                     </tbody>
                 </table>
             </div>
@@ -394,36 +355,222 @@
             </div>
 
             <p class="warning-text">
-                <strong>Attenzione:</strong> Eventuali punteggi da considerare al termine dell'iniziativa non sono gestiti dal tool (es. bonus 30 punti a squadre con almeno 6 donatori under25 e punteggio di 40 punti).
+                <strong>Nota Punteggi:</strong> Il bonus di 30 punti viene applicato automaticamente alle squadre con almeno 6 donatori under 25 e un punteggio donazioni pari o superiore a 40 punti.
             </p>
         </div>
 
     </div>
 
     <script>
-        // Funzione per aggiornare il testo col nome del file selezionato
+        // ELENCO SQUADRE CALCIO (Aggiornato: rimosse barrate, aggiunte evidenziate)
+        const SQUADRE_CALCIO = [
+            "640063   A.S.D  ACADEMY ANCONA",
+            "965059   A.S.D. ALTO PIAVE",
+            "001770   U.S.   AMARO",
+            "002030   U.S.D. AMPEZZO",
+            "935942   A.S.D. AMICI DELLO SPORT VISCO",
+            "953822   A.S.D. ANCONA LUMIGNACCO",
+            "059579   A.S.D. ANCORA",
+            "002570   A.S.D. AQUILEIA SEDES SPORT ARL",
+            "949541   A.S.D. AQUILA PALMANOVA C5",
+            "059581   A.S.D. ARDITA",
+            "003300   A.S.   ARTA TERME",
+            "003320   A.S.D. ARTENIESE",
+            "065820   U.S.   ASSOSANGIORGINA",
+            "074540   A.S.D. AURORA BUONACQUISTO",
+            "005150   A.S.D. AZZURRA PREMARIACCO",
+            "006300   A.S.D. BERTIOLO",
+            "640031   A.S.D. BLESSANESE",
+            "007070   A.S.D. BORDANO CALCIO",
+            "951528   A.S.D. BRIAN LIGNANO CALCIO",
+            "081035   A.S.D. BUJESE CALCIO",
+            "008180   A.S.D. BUTTRIO CALCIO",
+            "077527   A.S.D. CALCETTO CLARK UDINE",
+            "081036   A.S.D. CALCIO COMUNALE BASILIANO",
+            "937960   A.S.D. CALCIO RUDA",
+            "045100   A.S.D. CALCIO SAN VITO AL TORRE",
+            "066463   A.S.D. CALCIO TEOR",
+            "058940   A.S.D. CAMINO",
+            "059741   A.S.D. CAMPAGNOLA",
+            "009600   A.S.D. CAPORIACCO",
+            "078045   A.S.D. CASTIONS",
+            "011870   A.S.   CAVAZZO",
+            "061986   A.S.D. CEDARCHIS",
+            "012140   A.S.D. CENTRO ATLETICO RICREATIVO CICONICCO",
+            "640197   A.S.   CENTRO SEDIA C. NATISONE",
+            "060654   A.S.D. CERCIVENTO",
+            "064473   G.S.   CHIAVRIS",
+            "058127   SSDARL CJARLINS MUZANE",
+            "060765   A.S.D. COLLOREDO DI MONTE ALBANO",
+            "013690   A.S.D. COMEGLIANS",
+            "910973   A.S.D. COMETAZZURRA",
+            "013770   A.S.D. COMUNALE GONARS",
+            "044550   POL.   COMUNALE LESTIZZA",
+            "922798   A.S.D. COMUNALE POCENIA",
+            "077830   A.S.D. U.P. COMUNALE TAVAGNACCO",
+            "949518   A.S.D. CORNO CALCIO 1929",
+            "073301   G.S.   COSEANO",
+            "952882   A.S.D. CUSSIGNACCO CALCIO",
+            "940706   A.S.D. C5 MANZANO BRN 1988",
+            "963094   A.S.D. DE AGOSTINI ACADEMY",
+            "941040   A.S.D. DEPORTIVO JUNIOR",
+            "015490   A.S.D. DIANA",
+            "080043          DONATELLO",
+            "922683          EAGLES FUTSAL",
+            "016580   A.S.D. EDERA ENEMONZO",
+            "914334   A.S.D. FIUMICELLO 2004",
+            "018590   S.S.   FLUMIGNANO",
+            "018670          FOLGORE",
+            "918863   A.S.D. FORUM JULII CALCIO",
+            "019930   A.S.D. FULGOR",
+            "066312   A.S.D. FUS-CA",
+            "913965   A.S.D. FUTSAL UDINESE",
+            "965154   A.S.D. F.V.G. WOMEN UDINE",
+            "020920   A.S.D. GEMONESE",
+            "920387   A.S.D. IL CASTELLO DI GEMONA",
+            "059580   A.S.D. ILLEGIANA",
+            "024860   A.S.D. LA DELIZIA",
+            "070054   A.S.D. LAUCO",
+            "952881   A.S.D. LME",
+            "965332   A.S.D. MAGNANO IN RIVIERA",
+            "028590   A.S.D. MAJANESE",
+            "028860   SSDARL MANZANESE CALCIO",
+            "028960   A.S.D. MARANESE",
+            "030390   A.S.D. MERETO CALCIO",
+            "031150   A.S.D. MOBILIERI SUTRIO",
+            "031240   A.S.D. MOGGESE",
+            "640202   A.S.   MOIMACCO",
+            "081656   A.S.D. MORUZZO",
+            "953056   A.S.D. NEW TEAM LIGNANO C5",
+            "964480   A.S.D. NUOVA PASIANESE ACADEMY",
+            "068879   A.S.D. NIMIS",
+            "942285   A.S.D. OSOPPO RUSH SOCCER",
+            "058687   A.S.D. OVARESE",
+            "036020   U.S.   PALAZZOLO",
+            "024230   A.S.D. PALMARKET PAGNACCO",
+            "036230   A.C.   PALUZZA",
+            "PASIANESE CALCIO",
+            "059736          POL. AUDAX",
+            "932094   A.S.D. POLISPORTIVA CODROIPO",
+            "038330   A.S.D. POLISPORTIVA FLAMBRO",
+            "038640   S.S.   PONTEBBANA",
+            "023250   A.S.D. PORPETTO",
+            "076325   A.S.D. POZZUOLO DEL FRIULI",
+            "640022   A.S.D. PRO CERVIGNANO RUDA",
+            "057706   U.S.   PRO FAGAGNA",
+            "041130   A.S.D. RAGOGNA",
+            "081701   A.S.D. RANGERS",
+            "041360   A.C.   RAVASCLETTO",
+            "041450   A.S.D. REAL IMPONZO CADUNEA",
+            "041650   U.P.   REANESE",
+            "042450   A.S.D. RISANESE",
+            "952887   A.S.D. RIVE D ARCANO FLAIBANO",
+            "042740   A.S.D. RIVIGNANO",
+            "205057   A.S.   RIVOLTO",
+            "046530   A.S.   S. GOTTARDO",
+            "912419   A.S.D. SAN DANIELE CALCIO",
+            "047370   S.S.   SANGIORGINA",
+            "047710   A.S.D. SANTAMARIA",
+            "934204   A.S.D. SAVORGNANESE - FAEDIS",
+            "048610   A.S.D. SEDEGLIANO",
+            "068166   U.S.   SERENISSIMA PRADAMANO",
+            "945118   A.S.D. SEVEGLIANO FAUGLIS",
+            "050640   A.S.D. STELLA AZZURRA",
+            "932779   A.S.D. STRASSOLDO",
+            "058931   A.S.D. TAGLIAMENTO",
+            "071033   A.S.D. TARCENTINA",
+            "640214   A.S.D. TARVISIO",
+            "052000   A.S.D. TERZO",
+            "029350   POL    TIMAUCLEULIS",
+            "077833   A.S.D. TOLMEZZO CARNIA",
+            "051460   A.S.D. TORRE TC",
+            "052580   U.S.   TORREANESE",
+            "052880   A.S.D. TRASAGHIS",
+            "053100   A.S.D. TREPPO GRANDE",
+            "064232   A.S.D. TRICESIMO CALCIO",
+            "053370   U.S.   TRIVIGNANO",
+            "943506   A.S.D. UDINE CITY FUTBOL SALA",
+            "042090   ASRD   UDINE UNITED RIZZI CORMOR",
+            "917205   A.S.D. UNION MARTIGNACCO",
+            "080045   A.S.D. UNION 91",
+            "952883   A.S.D. UNIONE BASSO FRIULI",
+            "640072   A.S.D. UNIONE CALCIO 3 STELLE",
+            "54350    U.S.D. VALNATISONE CALCIO",
+            "640091   A.C.   VAL DEL LAGO",
+            "064000   A.S.D. VAL RESIA",
+            "943335   A.S.D. VARMESE",
+            "054730   S.S.D. VELOX PAULARO",
+            "060662   A.S.D. VERZEGNIS",
+            "055670   A.S.D. VILLA",
+            "056000   A.S.D. VILLANOVA CALCIO",
+            "942303   A.S.D. VIOLA",
+            "057630   A.S.D. ZOMPICCHIA"
+        ];
+
+        // ELENCO SQUADRE PALLAVOLO (Estratte dal file Excel Fipav Udine)
+        const SQUADRE_PALLAVOLO = [
+            "70320007 - ASSOCIAZIONE SPORTIVA MAJANESE",
+            "70320008 - PAV NATISONIA A.S.D.",
+            "70320011 - VOLLEY CIVIDALE A.S.D.",
+            "70320016 - A.S.D. ROJALESE",
+            "70320019 - ASD LOW WEST V.R. M.GASPARI",
+            "70320020 - S.D. PALLAVOLO SANGIORGINA",
+            "70320042 - ASS.SPORT.DILETT.VIVIL",
+            "70320043 - SOC.POLISPORTIVA ZUGLIANO",
+            "70320045 - ASSOCIAZIONE POLISPORTIVA DILETTANTISTICA RIZZI UDINE",
+            "70320047 - POL.LIBERTAS MARTIGNACCO S.S.D. a R.L.",
+            "70320054 - A.S.D. BLU TEAM",
+            "70320074 - A.S.D. LIBERTAS FIUMICELLO",
+            "70320083 - ASD VOLLEY BALL GEMONA",
+            "70320092 - A.S.D. ARTEVOLLEY",
+            "70320108 - A.S.D. AMATORIALE PALAVOLLEY",
+            "70320117 - A.S.D. PALLAVOLO BUJA",
+            "70320131 - A.S.D. ANCONA DUE",
+            "70320133 - A.S.D. TARCENTO VOLLEY",
+            "70320140 - PALLAVOLO PALMANOVA A.S.D.",
+            "70320147 - A.S.D. PALLAVOLO GONARS",
+            "70320159 - A.S.D. PALLAVOLO REANA",
+            "70320164 - ASS. SPORT. DILETT. PALLAVOLO SEDEGLIANO",
+            "70320166 - A.S.D. PALLAVOLO PASIAN DI PRATO",
+            "70320173 - A.S.D. CAPORIACCO",
+            "70320179 - ASD PALLAVOLO FRIULI VENEZIA GIULIA",
+            "70320188 - A.S.D. AQUILEIA VOLLEY",
+            "70320194 - A.S.D. PALLAVOLO TRICESIMO",
+            "70320202 - CS LIBERTAS CERVIGNANO ASD",
+            "70320214 - A.S.D. VOLLEY CLUB LATISANA",
+            "70320215 - ASS. DILETTANTISTICA LIBERTAS PASIANO",
+            "70320217 - A.S.D. BASILIANO VOLLEY",
+            "70320224 - ASD REAL PAULARO",
+            "70320226 - ASD VOLLEY CLUB LIGNANO",
+            "70320231 - ASS. SPORT. DILETT. AURORA VOLLEY",
+            "70320233 - A.S.D. CHIONS VOLLEY",
+            "70320234 - HORUS VOLLEY A.S.D.",
+            "70320235 - APD CERVIGNANO",
+            "70320238 - ASD VOLLEY CODROIPO",
+            "70320241 - PALLAVOLO ALTO FRIULI A.S.D.",
+            "70320242 - ASD VB TALMASSONS",
+            "70320248 - PALLAVOLO UDINE A.S.D."
+        ];
+
+        let calcoloClassificaGlobal = []; // Contiene i dati elaborati per l'export Excel
+
         function updateFileName(input, textId) {
             const fileName = input.files.length > 0 ? input.files[0].name : "Nessun file selezionato";
             document.getElementById(textId).innerText = fileName;
         }
 
-        // Sistema di transizione fluido tra le schermate
         function switchView(targetViewId) {
             const views = document.querySelectorAll('.view');
-            views.forEach(view => {
-                view.classList.remove('active');
-            });
-            
+            views.forEach(view => view.classList.remove('active'));
             setTimeout(() => {
                 document.getElementById(targetViewId).classList.add('active');
-            }, 50); // Piccolo delay per far scattare la transizione CSS
+            }, 50);
         }
 
-        // Funzione di utilità per leggere un file Excel come Array di Oggetti JSON
         function readExcel(file) {
             return new Promise((resolve, reject) => {
                 if (!file) {
-                    resolve([]); // Ritorna array vuoto se file non presente
+                    resolve([]);
                     return;
                 }
                 const reader = new FileReader();
@@ -431,7 +578,7 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const json = XLSX.utils.sheet_to_json(firstSheet);
+                    const json = XLSX.utils.sheet_to_json(firstSheet, {defval: ""});
                     resolve(json);
                 };
                 reader.onerror = reject;
@@ -439,7 +586,11 @@
             });
         }
 
-        // Funzione principale di elaborazione
+        function normalizeKey(str) {
+            if (!str) return "";
+            return str.toString().toLowerCase().replace(/[^a-z0-9]/g, "");
+        }
+
         async function generateLeaderboard() {
             const fileDonatori = document.getElementById('file-donatori').files[0];
             const fileDonazioni = document.getElementById('file-donazioni').files[0];
@@ -449,72 +600,238 @@
             document.getElementById('loading-spinner').style.display = 'block';
 
             try {
-                // Legge i 3 file in parallelo
                 const [donatori, donazioni, iscrizioni] = await Promise.all([
                     readExcel(fileDonatori),
                     readExcel(fileDonazioni),
                     readExcel(fileIscrizioni)
                 ]);
-                
-                let classificaData = [];
 
-                if (iscrizioni.length > 0 && donazioni.length > 0) {
-                    // Metti qui la logica di calcolo reale
-                } else {
-                    // MOCKUP DATA per test visuale
-                    classificaData = [
-                        { squadra: "95. 038640 S.S. PONTEBBANA", sangue: 156, plasma: 70, altre: 0, score: 296, under25: 15 },
-                        { squadra: "146. 056000 A.S.D. VILLANOVA", sangue: 86, plasma: 52, altre: 2, score: 194, under25: 4 },
-                        { squadra: "126. 051460 A.S.D. TORRE TC", sangue: 102, plasma: 44, altre: 1, score: 192, under25: 5 },
-                        { squadra: "54. 015490 A.S.D. DIANA", sangue: 67, plasma: 56, altre: 4, score: 187, under25: 9 },
-                        { squadra: "142. 943335 A.S.D. VARMESE", sangue: 56, plasma: 41, altre: 5, score: 148, under25: 8 }
-                    ];
+                const sportSelezionatoValue = document.getElementById('sport-type').value;
+                const sportSelezionatoText = document.getElementById('sport-type').options[document.getElementById('sport-type').selectedIndex].text;
+                document.getElementById('th-sport').innerText = sportSelezionatoText;
+
+                let elencoSquadreValide = [];
+                if (sportSelezionatoValue === "Squadra") {
+                    elencoSquadreValide = SQUADRE_CALCIO;
+                } else if (sportSelezionatoValue === "Team Pallavolo") {
+                    elencoSquadreValide = SQUADRE_PALLAVOLO;
                 }
 
-                // Ordinamento classifica per Punteggio decrescente
-                classificaData.sort((a, b) => b.score - a.score);
+                let mapDonatoriSquadra = {};
+                let mapDonatoriEta = {};
 
-                // Aggiorna nome colonna sport in base alla selezione
-                const sportSelezionato = document.getElementById('sport-type').options[document.getElementById('sport-type').selectedIndex].text;
-                document.getElementById('th-sport').innerText = sportSelezionato;
+                // Processa Donatori e Iscrizioni
+                iscrizioni.forEach(row => {
+                    const idDonatore = row['Codice Fiscale'] || row['CF'] || row['CodiceDonatore'] || row['ID Donatore'] || row['Tessera'];
+                    const squadra = row['Squadra'] || row['Societa'] || row['Società'] || row['Team'] || row['Denominazione'];
+                    if (idDonatore && squadra) {
+                        mapDonatoriSquadra[normalizeKey(idDonatore)] = squadra;
+                    }
+                });
 
-                // Renderizza la tabella
+                donatori.forEach(row => {
+                    const idDonatore = row['Codice Fiscale'] || row['CF'] || row['CodiceDonatore'] || row['ID Donatore'] || row['Tessera'];
+                    const squadra = row['Squadra'] || row['Societa'] || row['Società'] || row['Team'];
+                    const eta = parseInt(row['Età'] || row['Eta'] || row['Age'] || 0);
+
+                    const key = normalizeKey(idDonatore);
+                    if (key && squadra && !mapDonatoriSquadra[key]) {
+                        mapDonatoriSquadra[key] = squadra;
+                    }
+                    if (key && eta) {
+                        mapDonatoriEta[key] = eta;
+                    }
+                });
+
+                // Aggregazione dati per squadra
+                let statsSquadre = {};
+
+                // Inizializza tutte le squadre dell'elenco ufficiale
+                elencoSquadreValide.forEach(sq => {
+                    statsSquadre[sq] = {
+                        squadra: sq,
+                        sangue: 0,
+                        plasma: 0,
+                        altre: 0,
+                        under25Donatori: new Set()
+                    };
+                });
+
+                // Elabora Donazioni
+                if (donazioni.length > 0) {
+                    donazioni.forEach(row => {
+                        const idDonatore = row['Codice Fiscale'] || row['CF'] || row['CodiceDonatore'] || row['ID Donatore'] || row['Tessera'];
+                        let squadra = row['Squadra'] || row['Societa'] || row['Società'] || row['Team'];
+                        const tipoDonazione = (row['Tipo Donazione'] || row['Tipo'] || row['Donazione'] || "").toString().toLowerCase();
+                        
+                        const keyDonatore = normalizeKey(idDonatore);
+                        if (!squadra && keyDonatore && mapDonatoriSquadra[keyDonatore]) {
+                            squadra = mapDonatoriSquadra[keyDonatore];
+                        }
+
+                        if (squadra) {
+                            // Cerca corrispondenza tra le squadre ufficiali
+                            let squadraMatch = elencoSquadreValide.find(sq => normalizeKey(sq) === normalizeKey(squadra)) || squadra;
+
+                            if (!statsSquadre[squadraMatch]) {
+                                statsSquadre[squadraMatch] = {
+                                    squadra: squadraMatch,
+                                    sangue: 0,
+                                    plasma: 0,
+                                    altre: 0,
+                                    under25Donatori: new Set()
+                                };
+                            }
+
+                            if (tipoDonazione.includes('sangue') || tipoDonazione.includes('intero')) {
+                                statsSquadre[squadraMatch].sangue++;
+                            } else if (tipoDonazione.includes('plasma') || tipoDonazione.includes('aferesi')) {
+                                statsSquadre[squadraMatch].plasma++;
+                            } else {
+                                statsSquadre[squadraMatch].altre++;
+                            }
+
+                            if (keyDonatore && mapDonatoriEta[keyDonatore] && mapDonatoriEta[keyDonatore] < 25) {
+                                statsSquadre[squadraMatch].under25Donatori.add(keyDonatore);
+                            }
+                        }
+                    });
+                } else if (iscrizioni.length === 0 && donatori.length === 0) {
+                    // MOCKUP DATA per test visivo se nessun file è caricato
+                    const mockList = elencoSquadreValide.length >= 5 ? elencoSquadreValide.slice(0, 5) : [
+                        "95. 038640 S.S. PONTEBBANA",
+                        "146. 056000 A.S.D. VILLANOVA CALCIO",
+                        "126. 051460 A.S.D. TORRE TC",
+                        "54. 015490 A.S.D. DIANA",
+                        "142. 943335 A.S.D. VARMESE"
+                    ];
+                    statsSquadre = {};
+                    statsSquadre[mockList[0]] = { squadra: mockList[0], sangue: 156, plasma: 70, altre: 0, under25Count: 15 };
+                    statsSquadre[mockList[1]] = { squadra: mockList[1], sangue: 86, plasma: 52, altre: 2, under25Count: 4 };
+                    statsSquadre[mockList[2]] = { squadra: mockList[2], sangue: 102, plasma: 44, altre: 1, under25Count: 5 };
+                    statsSquadre[mockList[3]] = { squadra: mockList[3], sangue: 67, plasma: 56, altre: 4, under25Count: 9 };
+                    statsSquadre[mockList[4]] = { squadra: mockList[4], sangue: 56, plasma: 41, altre: 5, under25Count: 8 };
+                }
+
+                // Calcolo Punteggi e Bonus
+                let classificaArray = Object.values(statsSquadre).map(item => {
+                    const u25 = item.under25Count !== undefined ? item.under25Count : item.under25Donatori.size;
+                    const scoreDonazioni = item.sangue + item.plasma + item.altre;
+                    const haBonus = (u25 >= 6 && scoreDonazioni >= 40);
+                    const bonusVal = haBonus ? 30 : 0;
+                    const totPunti = scoreDonazioni + bonusVal;
+
+                    return {
+                        squadra: item.squadra,
+                        sangue: item.sangue,
+                        plasma: item.plasma,
+                        altre: item.altre,
+                        scoreDonazioni: scoreDonazioni,
+                        under25: u25,
+                        bonus: bonusVal,
+                        totPunti: totPunti
+                    };
+                });
+
+                // Ordinamento decrescente per Punteggio Totale
+                classificaArray.sort((a, b) => b.totPunti - a.totPunti || b.scoreDonazioni - a.scoreDonazioni);
+
+                // Assegnazione Posizione e Formattazione Finale
+                calcoloClassificaGlobal = classificaArray.map((row, index) => ({
+                    posizione: index + 1,
+                    squadra: row.squadra,
+                    sangue: row.sangue,
+                    plasma: row.plasma,
+                    altre: row.altre,
+                    scoreDonazioni: row.scoreDonazioni,
+                    under25: row.under25,
+                    bonus: row.bonus > 0 ? 30 : "",
+                    totPunti: row.totPunti,
+                    classifica: index + 1
+                }));
+
+                // Renderizza Tabella HTML
                 const tbody = document.getElementById('leaderboard-body');
-                tbody.innerHTML = ''; 
+                tbody.innerHTML = '';
 
-                classificaData.forEach((row, index) => {
+                calcoloClassificaGlobal.forEach(row => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><strong>${index + 1}</strong></td>
+                        <td><strong>${row.posizione}</strong></td>
                         <td>${row.squadra}</td>
                         <td>${row.sangue}</td>
                         <td>${row.plasma}</td>
                         <td>${row.altre}</td>
-                        <td><strong>${row.score}</strong></td>
+                        <td><strong>${row.scoreDonazioni}</strong></td>
                         <td>${row.under25}</td>
+                        <td>${row.bonus !== "" ? '<span style="color:green; font-weight:bold;">+30</span>' : '-'}</td>
+                        <td><strong>${row.totPunti}</strong></td>
                     `;
                     tbody.appendChild(tr);
                 });
 
-                // Transizione alla vista dei risultati
                 setTimeout(() => {
                     document.getElementById('btn-generate').style.display = 'block';
                     document.getElementById('loading-spinner').style.display = 'none';
                     switchView('results-view');
-                }, 800); 
+                }, 600);
 
             } catch (error) {
                 console.error(error);
-                alert("Si è verificato un errore durante l'elaborazione dei file. Controlla il formato.");
+                alert("Si è verificato un errore durante l'elaborazione dei file. Controlla la struttura dei fogli.");
                 document.getElementById('btn-generate').style.display = 'block';
                 document.getElementById('loading-spinner').style.display = 'none';
             }
         }
 
-        // Funzione per scaricare la tabella generata in formato Excel
+        // Funzione per scaricare il file Excel completo nel formato "CLASSIFICA FINALE"
         function downloadExcel() {
-            const table = document.getElementById('leaderboard-table');
-            const wb = XLSX.utils.table_to_book(table, {sheet: "Classifica"});
+            if (!calcoloClassificaGlobal || calcoloClassificaGlobal.length === 0) {
+                alert("Nessun dato da esportare.");
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            // 1. Foglio CONTEGGI
+            const dataConteggi = calcoloClassificaGlobal.map(row => ({
+                "Posizione": row.posizione,
+                "Squadra": row.squadra,
+                "N. donazioni sangue intero": row.sangue,
+                "N. donazione plasma da aferesi": row.plasma,
+                "N. altre donazioni": row.altre,
+                "Punteggio da donazioni": row.scoreDonazioni,
+                "Donatori under 25": row.under25,
+                "Bonus (+6 UNDER25)": row.bonus,
+                "TOT. PUNTI": row.totPunti,
+                "CLASSIFICA": row.classifica
+            }));
+            const wsConteggi = XLSX.utils.json_to_sheet(dataConteggi);
+            XLSX.utils.book_append_sheet(wb, wsConteggi, "CONTEGGI");
+
+            // 2. Foglio CLASSIFICA FINALE PRIMI 10
+            const primi10 = calcoloClassificaGlobal.slice(0, 10).map(row => ({
+                "Posizione": row.posizione,
+                "Squadra": row.squadra,
+                "Punteggio TOTALE": row.totPunti
+            }));
+            const wsPrimi10 = XLSX.utils.json_to_sheet(primi10);
+            XLSX.utils.book_append_sheet(wb, wsPrimi10, "CLASSIFICA FINALE PRIMI 10");
+
+            // 3. Foglio per ELIAS
+            const dataElias = calcoloClassificaGlobal.map(row => ({
+                "Posizione": row.posizione,
+                "Squadra": row.squadra,
+                "N. donazioni sangue intero": row.sangue,
+                "N. donazione plasma da aferesi": row.plasma,
+                "N. altre donazioni": row.altre,
+                "Punteggio da donazioni": row.scoreDonazioni,
+                "Donatori under 25": row.under25
+            }));
+            const wsElias = XLSX.utils.json_to_sheet(dataElias);
+            XLSX.utils.book_append_sheet(wb, wsElias, "per ELIAS");
+
+            // Genera e scarica il file Excel
             XLSX.writeFile(wb, 'Classifica_Coppa_Dono_26-27.xlsx');
         }
     </script>
