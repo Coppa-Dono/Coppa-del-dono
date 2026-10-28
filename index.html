@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AFDS Dono Cup Leaderboard Generator | AFDS-26/27</title>
+    <!-- Favicon con la goccia -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩸</text></svg>">
     <!-- Libreria SheetJS per leggere e scrivere file Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -364,9 +366,9 @@
     <script>
         // ELENCO SQUADRE CALCIO (Aggiornato: rimosse barrate, aggiunte evidenziate)
         const SQUADRE_CALCIO = [
-            "640063   A.S.D  ACADEMY ANCONA",
+            "640063   A.S.D   ACADEMY ANCONA",
             "965059   A.S.D. ALTO PIAVE",
-            "001770   U.S.   AMARO",
+            "001770   U.S.    AMARO",
             "002030   U.S.D. AMPEZZO",
             "935942   A.S.D. AMICI DELLO SPORT VISCO",
             "953822   A.S.D. ANCONA LUMIGNACCO",
@@ -374,9 +376,9 @@
             "002570   A.S.D. AQUILEIA SEDES SPORT ARL",
             "949541   A.S.D. AQUILA PALMANOVA C5",
             "059581   A.S.D. ARDITA",
-            "003300   A.S.   ARTA TERME",
+            "003300   A.S.    ARTA TERME",
             "003320   A.S.D. ARTENIESE",
-            "065820   U.S.   ASSOSANGIORGINA",
+            "065820   U.S.    ASSOSANGIORGINA",
             "074540   A.S.D. AURORA BUONACQUISTO",
             "005150   A.S.D. AZZURRA PREMARIACCO",
             "006300   A.S.D. BERTIOLO",
@@ -394,22 +396,22 @@
             "059741   A.S.D. CAMPAGNOLA",
             "009600   A.S.D. CAPORIACCO",
             "078045   A.S.D. CASTIONS",
-            "011870   A.S.   CAVAZZO",
+            "011870   A.S.    CAVAZZO",
             "061986   A.S.D. CEDARCHIS",
             "012140   A.S.D. CENTRO ATLETICO RICREATIVO CICONICCO",
-            "640197   A.S.   CENTRO SEDIA C. NATISONE",
+            "640197   A.S.    CENTRO SEDIA C. NATISONE",
             "060654   A.S.D. CERCIVENTO",
-            "064473   G.S.   CHIAVRIS",
+            "064473   G.S.    CHIAVRIS",
             "058127   SSDARL CJARLINS MUZANE",
             "060765   A.S.D. COLLOREDO DI MONTE ALBANO",
             "013690   A.S.D. COMEGLIANS",
             "910973   A.S.D. COMETAZZURRA",
             "013770   A.S.D. COMUNALE GONARS",
-            "044550   POL.   COMUNALE LESTIZZA",
+            "044550   POL.    COMUNALE LESTIZZA",
             "922798   A.S.D. COMUNALE POCENIA",
             "077830   A.S.D. U.P. COMUNALE TAVAGNACCO",
             "949518   A.S.D. CORNO CALCIO 1929",
-            "073301   G.S.   COSEANO",
+            "073301   G.S.    COSEANO",
             "952882   A.S.D. CUSSIGNACCO CALCIO",
             "940706   A.S.D. C5 MANZANO BRN 1988",
             "963094   A.S.D. DE AGOSTINI ACADEMY",
@@ -419,7 +421,7 @@
             "922683          EAGLES FUTSAL",
             "016580   A.S.D. EDERA ENEMONZO",
             "914334   A.S.D. FIUMICELLO 2004",
-            "018590   S.S.   FLUMIGNANO",
+            "018590   S.S.    FLUMIGNANO",
             "018670          FOLGORE",
             "918863   A.S.D. FORUM JULII CALCIO",
             "019930   A.S.D. FULGOR",
@@ -439,41 +441,41 @@
             "030390   A.S.D. MERETO CALCIO",
             "031150   A.S.D. MOBILIERI SUTRIO",
             "031240   A.S.D. MOGGESE",
-            "640202   A.S.   MOIMACCO",
+            "640202   A.S.    MOIMACCO",
             "081656   A.S.D. MORUZZO",
             "953056   A.S.D. NEW TEAM LIGNANO C5",
             "964480   A.S.D. NUOVA PASIANESE ACADEMY",
             "068879   A.S.D. NIMIS",
             "942285   A.S.D. OSOPPO RUSH SOCCER",
             "058687   A.S.D. OVARESE",
-            "036020   U.S.   PALAZZOLO",
+            "036020   U.S.    PALAZZOLO",
             "024230   A.S.D. PALMARKET PAGNACCO",
-            "036230   A.C.   PALUZZA",
+            "036230   A.C.    PALUZZA",
             "PASIANESE CALCIO",
             "059736          POL. AUDAX",
             "932094   A.S.D. POLISPORTIVA CODROIPO",
             "038330   A.S.D. POLISPORTIVA FLAMBRO",
-            "038640   S.S.   PONTEBBANA",
+            "038640   S.S.    PONTEBBANA",
             "023250   A.S.D. PORPETTO",
             "076325   A.S.D. POZZUOLO DEL FRIULI",
             "640022   A.S.D. PRO CERVIGNANO RUDA",
-            "057706   U.S.   PRO FAGAGNA",
+            "057706   U.S.    PRO FAGAGNA",
             "041130   A.S.D. RAGOGNA",
             "081701   A.S.D. RANGERS",
-            "041360   A.C.   RAVASCLETTO",
+            "041360   A.C.    RAVASCLETTO",
             "041450   A.S.D. REAL IMPONZO CADUNEA",
-            "041650   U.P.   REANESE",
+            "041650   U.P.    REANESE",
             "042450   A.S.D. RISANESE",
             "952887   A.S.D. RIVE D ARCANO FLAIBANO",
             "042740   A.S.D. RIVIGNANO",
-            "205057   A.S.   RIVOLTO",
-            "046530   A.S.   S. GOTTARDO",
+            "205057   A.S.    RIVOLTO",
+            "046530   A.S.    S. GOTTARDO",
             "912419   A.S.D. SAN DANIELE CALCIO",
-            "047370   S.S.   SANGIORGINA",
+            "047370   S.S.    SANGIORGINA",
             "047710   A.S.D. SANTAMARIA",
             "934204   A.S.D. SAVORGNANESE - FAEDIS",
             "048610   A.S.D. SEDEGLIANO",
-            "068166   U.S.   SERENISSIMA PRADAMANO",
+            "068166   U.S.    SERENISSIMA PRADAMANO",
             "945118   A.S.D. SEVEGLIANO FAUGLIS",
             "050640   A.S.D. STELLA AZZURRA",
             "932779   A.S.D. STRASSOLDO",
@@ -481,22 +483,22 @@
             "071033   A.S.D. TARCENTINA",
             "640214   A.S.D. TARVISIO",
             "052000   A.S.D. TERZO",
-            "029350   POL    TIMAUCLEULIS",
+            "029350   POL     TIMAUCLEULIS",
             "077833   A.S.D. TOLMEZZO CARNIA",
             "051460   A.S.D. TORRE TC",
-            "052580   U.S.   TORREANESE",
+            "052580   U.S.    TORREANESE",
             "052880   A.S.D. TRASAGHIS",
             "053100   A.S.D. TREPPO GRANDE",
             "064232   A.S.D. TRICESIMO CALCIO",
-            "053370   U.S.   TRIVIGNANO",
+            "053370   U.S.    TRIVIGNANO",
             "943506   A.S.D. UDINE CITY FUTBOL SALA",
-            "042090   ASRD   UDINE UNITED RIZZI CORMOR",
+            "042090   ASRD    UDINE UNITED RIZZI CORMOR",
             "917205   A.S.D. UNION MARTIGNACCO",
             "080045   A.S.D. UNION 91",
             "952883   A.S.D. UNIONE BASSO FRIULI",
             "640072   A.S.D. UNIONE CALCIO 3 STELLE",
-            "54350    U.S.D. VALNATISONE CALCIO",
-            "640091   A.C.   VAL DEL LAGO",
+            "54350     U.S.D. VALNATISONE CALCIO",
+            "640091   A.C.    VAL DEL LAGO",
             "064000   A.S.D. VAL RESIA",
             "943335   A.S.D. VARMESE",
             "054730   S.S.D. VELOX PAULARO",
@@ -784,55 +786,30 @@
             }
         }
 
-        // Funzione per scaricare il file Excel completo nel formato "CLASSIFICA FINALE"
         function downloadExcel() {
-            if (!calcoloClassificaGlobal || calcoloClassificaGlobal.length === 0) {
-                alert("Nessun dato da esportare.");
+            if (calcoloClassificaGlobal.length === 0) {
+                alert("Nessun dato da esportare. Genera prima la classifica.");
                 return;
             }
 
-            const wb = XLSX.utils.book_new();
-
-            // 1. Foglio CONTEGGI
-            const dataConteggi = calcoloClassificaGlobal.map(row => ({
-                "Posizione": row.posizione,
-                "Squadra": row.squadra,
-                "N. donazioni sangue intero": row.sangue,
-                "N. donazione plasma da aferesi": row.plasma,
-                "N. altre donazioni": row.altre,
-                "Punteggio da donazioni": row.scoreDonazioni,
-                "Donatori under 25": row.under25,
-                "Bonus (+6 UNDER25)": row.bonus,
-                "TOT. PUNTI": row.totPunti,
-                "CLASSIFICA": row.classifica
+            const dataToExport = calcoloClassificaGlobal.map(item => ({
+                "Posizione": item.posizione,
+                "Squadra": item.squadra,
+                "Sangue Intero": item.sangue,
+                "Plasma da Aferesi": item.plasma,
+                "Altre Donazioni": item.altre,
+                "Punteggio Donazioni": item.scoreDonazioni,
+                "Partecipanti Under 25": item.under25,
+                "Bonus (+30)": item.bonus,
+                "Punteggio Totale": item.totPunti
             }));
-            const wsConteggi = XLSX.utils.json_to_sheet(dataConteggi);
-            XLSX.utils.book_append_sheet(wb, wsConteggi, "CONTEGGI");
 
-            // 2. Foglio CLASSIFICA FINALE PRIMI 10
-            const primi10 = calcoloClassificaGlobal.slice(0, 10).map(row => ({
-                "Posizione": row.posizione,
-                "Squadra": row.squadra,
-                "Punteggio TOTALE": row.totPunti
-            }));
-            const wsPrimi10 = XLSX.utils.json_to_sheet(primi10);
-            XLSX.utils.book_append_sheet(wb, wsPrimi10, "CLASSIFICA FINALE PRIMI 10");
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Classifica");
 
-            // 3. Foglio per ELIAS
-            const dataElias = calcoloClassificaGlobal.map(row => ({
-                "Posizione": row.posizione,
-                "Squadra": row.squadra,
-                "N. donazioni sangue intero": row.sangue,
-                "N. donazione plasma da aferesi": row.plasma,
-                "N. altre donazioni": row.altre,
-                "Punteggio da donazioni": row.scoreDonazioni,
-                "Donatori under 25": row.under25
-            }));
-            const wsElias = XLSX.utils.json_to_sheet(dataElias);
-            XLSX.utils.book_append_sheet(wb, wsElias, "per ELIAS");
-
-            // Genera e scarica il file Excel
-            XLSX.writeFile(wb, 'Classifica_Coppa_Dono_26-27.xlsx');
+            const sportSelezionatoText = document.getElementById('sport-type').options[document.getElementById('sport-type').selectedIndex].text;
+            XLSX.writeFile(workbook, `Classifica_Coppa_Dono_${sportSelezionatoText.replace(/[^a-zA-Z0-9]/g, "_")}.xlsx`);
         }
     </script>
 </body>
